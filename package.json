@@ -1,0 +1,13 @@
+{
+    "name": "scrapey-service",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {
+        "jsdom": "0.2.19",
+        "express": "3.0.3",
+        "sinon": "1.5.0",
+        "asyncjs": "0.0.9",
+        "architect": "0.1.4",
+        "request": "2.12.0"
+    }
+}
