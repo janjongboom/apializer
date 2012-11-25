@@ -8,6 +8,7 @@
         "sinon": "1.5.0",
         "asyncjs": "0.0.9",
         "architect": "0.1.4",
-        "request": "2.12.0"
+        "request": "2.12.0",
+        "async": "0.1.22"
     }
 }

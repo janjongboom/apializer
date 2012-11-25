@@ -1,22 +1,28 @@
 var assert = require("assert");
 var Parser = require("./parser");
-var asyncjs = require("asyncjs");
+var async = require("async");
 
 module.exports = function(options, imports, register) {
     assert.equal(options.definitions instanceof Array, true, "Option 'definitions' is required");
 
-    asyncjs.list(options.definitions).map(function (item, next) {
+    async.map(options.definitions, function (item, next) {
+        var reqd, err;
+        
         try {
-            next(null, require(item));
+            reqd = require(item);
         }
-        catch (ex) {
-            next(ex);
+        catch (ex) {            
+            err = ex;
         }
-    }).end(function (err, files) {
+        
+        next(err, reqd);
+    }, function (err, files) {
         if (err) return register(err);
         
         var parser = new Parser(files);
         
-        register(null, parser);
+        register(null, {
+            "parser": parser
+        });
     });
 };

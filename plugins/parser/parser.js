@@ -1,11 +1,12 @@
 var Url = require("url");
 var jsdom = require("jsdom");
+var fs = require("fs");
 
 module.exports = function (cache) {
     var self = this;
     
     this.cache = cache;
-        
+    
     this.parseUrl = function (url) {
         url = Url.parse(url);
         return {
@@ -14,7 +15,11 @@ module.exports = function (cache) {
         };
     };
         
-    this.findHandler = function (host, path, callback) {
+    this.findHandler = function (url, callback) {
+        var parsed = self.parseUrl(url);
+        var host = parsed.host;
+        var path = parsed.path;
+        
         var res = self.cache
             .filter(function (c) {
                 return c.host.test(host);
@@ -42,7 +47,13 @@ module.exports = function (cache) {
             var res = {};
             
             Object.keys(handler.extract).forEach(function (key) {
-                res[key] = handler.extract[key]($);
+                try {
+                    res[key] = handler.extract[key]($);
+                }
+                catch (ex) {
+                    console.error("Parsing", key, "failed", ex);
+                    res[key] = undefined;
+                }
             });
             
             callback(null, res);
@@ -50,7 +61,7 @@ module.exports = function (cache) {
     };
     
     this.instantiateJsdom = function (html, callback) {
-        jsdom.env(html, ["http://code.jquery.com/jquery.js"], function(err, window) {
+        jsdom.env(html, [ __dirname + "/jquery.js" ], function(err, window) {
             if (err) return callback(err);
             
             callback(null, window.$);

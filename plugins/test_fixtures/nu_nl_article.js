@@ -2,6 +2,7 @@ module.exports = {
     name: "Nu.nl article", // name for this schema
     host: /^(www\.)?nu\.nl$/, // domain we work on
     path: /^\/\w+\/\d+\//, // paths that we match
+    version: "1.0.0",
     
     extract: {
         title: function ($) {

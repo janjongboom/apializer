@@ -6,5 +6,5 @@ var config = architect.loadConfig(__dirname + "/config.js");
 architect.createApp(config, function (err, app) {
     if (err) throw err;
     
-    console.log("app ready");
+    console.log("Scrapey service started...");
 });

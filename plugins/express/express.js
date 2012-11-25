@@ -13,10 +13,6 @@ module.exports = function (options, imports, register) {
         res.end("Hello from Scrapey");
     });
     
-    app.getModule = function () {
-        return express;
-    };
-    
     register(null, {
         express: app
     });

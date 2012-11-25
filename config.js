@@ -1,4 +1,6 @@
-var defFolder = __dirname + "/plugins/test_fixtures";
+var fs = require("fs");
+var path = require("path");
+var defpath = path.join(__dirname, "/plugins/test_fixtures");
 
 module.exports =  [
     {
@@ -12,8 +14,8 @@ module.exports =  [
     },
     {
         packagePath: "./plugins/parser",
-        definitions: [
-            defFolder + "/nu_nl_article.js"
-        ]
+        definitions: fs.readdirSync(defpath).map(function (d) {
+            return path.join(defpath, d);
+        })
     }
 ];

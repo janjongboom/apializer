@@ -27,7 +27,7 @@ var ParserTest = function () {
     };
     
     this["test should get correct handler for nu.nl article"] = function(next) {
-        parser.findHandler("nu.nl", "/cat/12345/title", function (err, handler) {
+        parser.findHandler("http://nu.nl/cat/12345/title", function (err, handler) {
             assert.equal(err, null);
             assert.equal(handler.name, "Nu.nl article");
             
