@@ -27,6 +27,7 @@ module.exports = function setup (options, imports, register) {
                         res.end(req.query.callback + "(" + JSON.stringify(feed, null, 4) + ")");
                     }
                     else {
+                        console.log("serving", feed);
                         res.end(JSON.stringify(feed, null, 4));
                     }
                 });

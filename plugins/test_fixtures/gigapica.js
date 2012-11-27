@@ -1,4 +1,4 @@
-module.exports = {
+return {
     name: "GigaPica page", // name for this schema
     host: /^gigapica\.geenstijl\.nl$/, // domain we work on
     path: /^\/\d{4}\/\d{2}\//, // paths that we match

@@ -49,6 +49,8 @@ module.exports = function (cache) {
             Object.keys(handler.extract).forEach(function (key) {
                 try {
                     res[key] = handler.extract[key]($);
+                    // now trim all strings
+                    self.trimAllStrings(res[key]);
                 }
                 catch (ex) {
                     console.error("Parsing", key, "failed", ex);
@@ -66,5 +68,17 @@ module.exports = function (cache) {
             
             callback(null, window.$);
         });
+    };
+    
+    this.trimAllStrings = function (obj) {
+        for (var k in obj) {
+            if (!obj.hasOwnProperty(k)) continue;
+            
+            if (typeof obj[k] === "string")
+                obj[k] = obj[k].trim();
+            
+            if (typeof obj[k] === "object")
+                self.trimAllStrings(obj[k]);
+        }
     };
 };

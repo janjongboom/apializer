@@ -1,4 +1,4 @@
-module.exports = {
+return {
     name: "Nu.nl article", // name for this schema
     host: /^(www\.)?nu\.nl$/, // domain we work on
     path: /^\/\w+\/\d+\//, // paths that we match
