@@ -20,7 +20,7 @@ return {
         
         content: function ($) {
             var eles = $(".article").find("h2.summary, p");
-            var text = Array.prototype.slice.call(eles).map(function (el) {
+            var text = [].slice.call(eles).map(function (el) {
                 return el.textContent;
             }).join("\n").trim();
             

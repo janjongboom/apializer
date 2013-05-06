@@ -22,12 +22,14 @@ module.exports = function setup (options, imports, register) {
                 parser.parsePage(body, handler, function (err, feed) {
                     if (err) return next(err);
                     
-                    res.writeHead(200, { "Content-Type": "application/json" });
+                    res.writeHead(200, {
+                        "Content-Type": "application/json",
+                        "Access-Control-Allow-Origin": "*"
+                    });
                     if (req.query.callback) {
                         res.end(req.query.callback + "(" + JSON.stringify(feed, null, 4) + ")");
                     }
                     else {
-                        console.log("serving", feed);
                         res.end(JSON.stringify(feed, null, 4));
                     }
                 });

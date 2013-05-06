@@ -14,7 +14,7 @@ return {
         },
         
         steps: function ($) {
-            return Array.prototype.slice.call($("ol.advice-steps li")).map(function (step) {
+            return [].slice.call($("ol.advice-steps li")).map(function (step) {
                step = $(step);
                return {
                   transportation: step.find(".step-header .vh").text(),

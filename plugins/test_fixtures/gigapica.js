@@ -14,7 +14,7 @@ return {
         },
         
         articles: function ($) {
-            return Array.prototype.slice.call($(".artikel").find("p").has("img")).map(function (el) {
+            return [].slice.call($(".artikel").find("p").has("img")).map(function (el) {
                return {
                    image: $(el).find("img").attr("src"),
                    text: $(el).text().trim()
