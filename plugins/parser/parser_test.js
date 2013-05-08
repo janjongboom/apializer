@@ -4,23 +4,30 @@ var assert = require("assert");
 var Parser = require("./parser");
 var request = require("request");
 var fs = require("fs");
+var async = require("async");
 
 var ParserTest = function () {
-    var parser, nuArticleHandler;
+    var parser, articleHandlers = {};
     
     this.timeout = 5000;
     
     this.setUp = function (next) {
-        fs.readFile(__dirname + "/../test_fixtures/nu_nl_article.js", "utf8", function (err, data) {
+        async.map([
+            "nu_nl_article.js",
+            "cnn_article.js"
+        ], function(file, next) {
+            fs.readFile(__dirname + "/../test_fixtures/" + file, "utf8", function(err, data) {
+                if (err) return next(err);
+                
+                var handler = new Function(data)();
+                articleHandlers[file] = handler;
+                
+                next(null, handler);
+            });
+        }, function(err, handlers) {
             assert.equal(err, null);
             
-            nuArticleHandler = new Function(data)();
-            
-            var cache = [
-                nuArticleHandler
-            ];
-            
-            parser = new Parser(cache);
+            parser = new Parser(handlers);
             
             next();
         });
@@ -51,7 +58,7 @@ var ParserTest = function () {
             assert.equal(err, null);
             assert.equal(res.statusCode, 200);
             
-            parser.parsePage(body, nuArticleHandler, function (err, data) {
+            parser.parsePage(body, articleHandlers["nu_nl_article.js"], function (err, data) {
                 assert.equal(err, null);
                 
                 assert.equal(data.title, "Yoko Ono ontwerpt mannencollectie voor Opening Ceremony");
@@ -60,6 +67,26 @@ var ParserTest = function () {
                 assert.equal(data.image.height, 132);
                 assert.equal(data.image.src, "http://media.nu.nl/m/m1nx3bvalvan_sqr256.jpg");
                 assert.equal(data.content.substr(0, 9), "AMSTERDAM");
+                
+                next();
+            });
+        });
+    };
+    
+    this["test parsing cnn article"] = function(next) {
+        var url = "http://www.cnn.com/2013/05/07/us/ohio-missing-women-found/index.html?npt=NP1";
+        
+        // todo mock this away
+        request.get(url, function (err, res, body) {
+            assert.equal(err, null);
+            assert.equal(res.statusCode, 200);
+            
+            parser.parsePage(body, articleHandlers["cnn_article.js"], function (err, data) {
+                assert.equal(err, null);
+                
+                assert.equal(data.title, "'I never forgot about you': Families reunite with women held captive for years");
+                assert.equal(data.image, "http://i2.cdn.turner.com/cnn/dam/assets/130506221101-georgina-gina-dejesus-story-top.png");
+                assert.equal(data.body.substr(0, 8), "For more");
                 
                 next();
             });
@@ -88,8 +115,7 @@ var ParserTest = function () {
         assert.equal(testObj.fourth, "nada");
         
         next();
-        
-    }
+    };
 };
 
 module.exports = new ParserTest();

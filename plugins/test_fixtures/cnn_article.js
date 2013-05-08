@@ -14,7 +14,8 @@ return {
             }).join('\n\n');
         },
         image: function ($) {
-            return $('.cnn_strycntntlft>div>img').not('.box-image').attr('src') ||
+            var img = $('.cnn_strycntntlft>div>img');
+            return (!img.hasClass('box-image') && img.attr('src')) ||
                 $('meta[itemprop="thumbnailUrl"]').attr('content');
         }
     }
