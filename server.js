@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 require("longjohn");
+
 var architect = require("architect");
 
 var config = architect.loadConfig(__dirname + "/config.js");

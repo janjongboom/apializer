@@ -6,7 +6,7 @@ return {
     
     extract: {
         title: function ($) {
-            return $("h1:first").text();
+            return $("h1").eq(0).text();
         },
         
         image: function ($) {
@@ -21,7 +21,7 @@ return {
         content: function ($) {
             var eles = $(".article").find("h2.summary, p");
             var text = [].slice.call(eles).map(function (el) {
-                return el.textContent;
+                return $(el).text();
             }).join("\n").trim();
             
             return text;

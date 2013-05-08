@@ -10,7 +10,7 @@ return {
                 i = $(i);
                 return {
                     link: i.find('.nsFullStoryLink').attr('href'),
-                    title: i.find('.nsStory .thumb>span:first').text(),
+                    title: i.find('.nsStory .thumb>span').eq(0).text(),
                     image: i.find('img').attr('src')
                 };
             }).filter(function(i) {

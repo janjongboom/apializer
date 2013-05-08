@@ -1,6 +1,5 @@
 var Url = require("url");
-var jsdom = require("jsdom");
-var fs = require("fs");
+var cheerio = require("cheerio");
 
 module.exports = function (cache) {
     var self = this;
@@ -41,33 +40,23 @@ module.exports = function (cache) {
     };
     
     this.parsePage = function (html, handler, callback) {
-        self.instantiateJsdom(html, function (err, $) {
-            if (err) return callback(err);
-            
-            var res = {};
-            
-            Object.keys(handler.extract).forEach(function (key) {
-                try {
-                    res[key] = handler.extract[key]($);
-                    // now trim all strings
-                    self.trimAllStrings(res[key]);
-                }
-                catch (ex) {
-                    console.error("Parsing", key, "failed", ex);
-                    res[key] = undefined;
-                }
-            });
-            
-            callback(null, res);
+        var $ = cheerio.load(html);
+        
+        var res = {};
+        
+        Object.keys(handler.extract).forEach(function (key) {
+            try {
+                res[key] = handler.extract[key]($);
+                // now trim all strings
+                self.trimAllStrings(res[key]);
+            }
+            catch (ex) {
+                console.error("Parsing", key, "failed", ex);
+                res[key] = undefined;
+            }
         });
-    };
-    
-    this.instantiateJsdom = function (html, callback) {
-        jsdom.env(html, [ __dirname + "/jquery.js" ], function(err, window) {
-            if (err) return callback(err);
-            
-            callback(null, window.$);
-        });
+        
+        callback(null, res);
     };
     
     this.trimAllStrings = function (obj) {

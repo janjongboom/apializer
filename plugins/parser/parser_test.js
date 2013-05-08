@@ -43,21 +43,6 @@ var ParserTest = function () {
         });
     };
     
-    this["test jsDom injection should pass"] = function(next) {
-        var url = "http://www.nu.nl/lifestyle/2966302/yoko-ono-ontwerpt-mannencollectie-opening-ceremony.html";
-        
-        request.get(url, function (err, res, body) {
-            assert.equal(err, null);
-            assert.equal(res.statusCode, 200);
-            
-            parser.instantiateJsdom(body, function (err, $) {
-                assert.equal(err, null);
-                assert.equal(typeof $.ajax, "function");
-                next();
-            });
-        });
-    };
-    
     this["test parsing nunl article"] = function(next) {
         var url = "http://www.nu.nl/lifestyle/2966302/yoko-ono-ontwerpt-mannencollectie-opening-ceremony.html";
         
@@ -81,7 +66,7 @@ var ParserTest = function () {
         });
     };
     
-    this[">test trimAllStrings should trim all strings"] = function (next) {
+    this["test trimAllStrings should trim all strings"] = function (next) {
         var testObj = {
             first: "    hoi   ",
             second: {
