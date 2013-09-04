@@ -8,14 +8,18 @@ module.exports = function(options, imports, register) {
   assert(options.bucketPath, "Option 'bucketPath' required");
   assert(path.existsSync(options.bucketPath), "Option 'bucketPath' is not an existing path");
 
-  var pm = new ParserManager(options.bucketPath);
+  options.parserOptions = options.parserOptions || {};
+  options.parserOptions.maxRequestSize = options.parserOptions.maxRequestSize || 2 * 1024 * 1024;
+  options.parserOptions.allowedHeaders = options.parserOptions.allowedHeaders || ['set-cookie'];
+  
+  var pm = new ParserManager(options.bucketPath, options.parserOptions);
 
   register(null, {
     "parser-manager": pm
   });
 };
 
-function ParserManager(folder) {
+function ParserManager(folder, parserOptions) {
   var self = this;
 
   /**
@@ -68,11 +72,17 @@ function ParserManager(folder) {
 
         // then with that make plugins for architect
         var name = path.basename(folder);
-        return next(null, {
+        var plugin = {
           packagePath: '../parser-http',
           prefix: '/c/' + name,
           definitions: def
-        });
+        };
+        
+        for (var o in parserOptions) { 
+          plugin[o] = parserOptions[o]; 
+        }
+        
+        return next(null, plugin);
       });
     }, function(err, plugins) {
       if (err) return callback(err);

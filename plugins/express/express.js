@@ -22,6 +22,7 @@ module.exports = function(options, imports, register) {
   };
 
   app.use(allowCrossDomain);
+  app.disable('x-powered-by');
 
   app.listen(options.port, options.host);
 

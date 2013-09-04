@@ -1,20 +1,12 @@
-var request = require('request');
 var httpProxy = require('http-proxy');
 var Url = require('url');
+var chardet = require('chardet');
+var Iconv  = require('iconv').Iconv;
 
-module.exports = function(app, parser, prefix) {
+module.exports = function(app, parser, prefix, allowedHeaders, maxRequestSize) {
   var proxy = new httpProxy.RoutingProxy();
 
   app.all(prefix + '/', function(req, res, next) {
-    var _next = next;
-    next = function() {
-      res.writeHead = _writeHead;
-      res.write = _write;
-      res.end = _end;
-
-      _next.apply(this, arguments);
-    };
-
     if (!req.query.url) {
       return next('?url should be specified');
     }
@@ -26,11 +18,10 @@ module.exports = function(app, parser, prefix) {
     };
 
     req.url = parsedUrl.path;
+    // we don't want people sending us gzip'ed stuff
+    delete req.headers['accept-encoding'];
 
-    res.writeHead = function(code) {
-      responseCode = code;
-    };
-
+    var _setHeader = res.setHeader.bind(res);
     var _writeHead = res.writeHead.bind(res);
     var _write = res.write.bind(res);
     var _end = res.end.bind(res);
@@ -38,73 +29,72 @@ module.exports = function(app, parser, prefix) {
     var buffers = [];
     var totalLength = 0;
     var responseCode;
+    
+    function resetRes() {
+      res.setHeader = _setHeader;
+      res.writeHead = _writeHead;
+      res.write = _write;
+      res.end = _end;
+    }
+    
+    var _next = next;
+    next = function(err) {
+      resetRes();
+      
+      _next(err);
+    };
 
-    console.log('proxying', req.url, proxyOptions);
+    res.setHeader = function(name, value) {
+      // dont leak headers from client except if theyre in the list
+      if (allowedHeaders.indexOf(name) === -1)
+        return;
+      
+      _setHeader.apply(this, arguments);
+    };
+    
+    res.writeHead = function(code) {
+      responseCode = code;
+    };
 
     res.write = function(chunk, encoding) {
       totalLength += chunk.length;
-      if (totalLength > 2 * 1024 * 1024) {
+      if (totalLength > maxRequestSize) {
         console.log('request too big');
-
-        res.writeHead = _writeHead;
-        res.write = _write;
-        res.end = _end;
 
         buffers = null;
 
-        return next('Request exceeds maximum of 10 bytes');
+        return next('Request exceeds maximum of ' + maxRequestSize + ' bytes');
       }
-      console.log('write', chunk.length, encoding);
       buffers.push(chunk);
     };
 
     res.end = function(chunk, encoding) {
-      console.log('end', chunk && chunk.length, encoding);
-      var body = Buffer.concat(buffers).toString('utf8');
-      console.log('i has body', body.substr(0, 100));
+      var buffer = Buffer.concat(buffers);
+      var charset = chardet.detect(buffer);
+      var iconv = new Iconv(charset, 'UTF-8');
+      var body = iconv.convert(buffer).toString('utf8');
 
       parser.parsePage(body, req.query.url, function(err, feed, handlerName) {
         if (err) return next(err);
+        
+        resetRes();
 
         res.setHeader('Content-Type', 'application/json; charset=utf8');
         res.setHeader('Scrapey-Handler', handlerName);
 
-        console.log('writing head', responseCode, res._headers);
-        _writeHead(responseCode);
-
+        res.writeHead(responseCode);
+        
         if (req.query.callback) {
-          _write(req.query.callback + "(" + JSON.stringify(feed, null, 4) + ")");
+          res.end(req.query.callback + "(" + JSON.stringify(feed, null, 4) + ")");
         }
         else {
-          _write(JSON.stringify(feed, null, 4));
+          res.end(JSON.stringify(feed, null, 4));
         }
-        _end();
       });
     };
 
     return proxy.proxyRequest(req, res, proxyOptions);
   });
-
-    // request.get({
-    //   uri: req.query.url,
-    //   method: 'GET',
-    //   encoding: 'utf8'
-    // }, function(err, resp, body) {
-    //   if (err) return next(err);
-    //   if (resp.statusCode < 200 || resp.statusCode > 300) {
-    //     return next("Response should be 2xx but was " + resp.statusCode);
-    //   }
-
-    //   parser.parsePage(body, req.query.url, function(err, feed, handlerName) {
-    //     if (err) return next(err);
-
-    //     res.writeHead(200, {
-    //       "Content-Type": "application/json; charset=utf8",
-    //       "Scrapey-Handler": handlerName
-    //     });
-
-    //   });
-    // });
 
   console.log('Listening on', prefix);
 

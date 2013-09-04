@@ -14,6 +14,8 @@
         "architect": "git://github.com/janjongboom/architect.git#96ab69fa77b515110856b7414b87fb5ad3da8677",
         "async": "0.1.22",
         "longjohn": "0.0.4",
-        "http-proxy": "0.10.3"
+        "http-proxy": "0.10.3",
+        "chardet": "0.0.8",
+        "iconv": "2.0.7"
     }
 }

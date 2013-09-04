@@ -6,7 +6,9 @@ var definitionChecker = require("./definition-checker").check;
 
 module.exports = function setup (options, imports, register) {
     assert(options.prefix, "Option 'prefix' is required");
-    assert.equal(options.definitions instanceof Array, true, "Option 'definitions' is required");
+    assert(options.definitions instanceof Array, "Option 'definitions' is required");
+    assert(options.allowedHeaders instanceof Array, "Option 'allowedHeaders' is required");
+    assert(options.maxRequestSize, "Option 'maxRequestSize' is required");
 
     var app = imports.express;
     
@@ -24,11 +26,12 @@ module.exports = function setup (options, imports, register) {
         var parser = new Parser(files);
         
         // now attach the parser to a URL
-        var web = createWebBinding(app, parser, options.prefix);
+        var web = createWebBinding(app, parser, options.prefix, options.allowedHeaders,
+          options.maxRequestSize);
         
         register(null, {
             onDestroy: function() {
-                console.log('destroyyyyy');
+                console.log('destroying', options.prefix);
                 web.unregister();
             }
         });
