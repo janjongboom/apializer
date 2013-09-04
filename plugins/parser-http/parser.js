@@ -8,39 +8,38 @@ module.exports = function (cache) {
     
     this.parseUrl = function (url) {
         url = Url.parse(url);
-        return {
-            host: url.host,
-            path: url.path
-        };
+        return url;
     };
         
-    this.findHandler = function (url, callback) {
-        var parsed = self.parseUrl(url);
-        var host = parsed.host;
-        var path = parsed.path;
+    this.findHandler = function (url, $) {
+        var parsedUrl = self.parseUrl(url);
         
         var res = self.cache
             .filter(function (c) {
-                return c.host.test(host);
-            })
-            .filter(function (c) {
-                return c.path.test(path);
+                return c.matches(parsedUrl, $);
             });
-        
+            
         if (res.length > 1) {
-            return callback("Multiple handlers found " + 
-                res.map(function (r) { return r.name; }).join(","));
+            throw "Multiple handlers found " + 
+                res.map(function (r) { return r.name; }).join(",");
         }
         else if (res.length === 0) {
-            return callback("No handlers found");
+            throw "No handlers found";
         }
         else {
-            return callback(null, res[0]);
+            return res[0];
         }
     };
     
-    this.parsePage = function (html, handler, callback) {
+    this.parsePage = function (html, url, callback) {
         var $ = cheerio.load(html);
+        var handler;
+        try {
+            handler = this.findHandler(url, $);
+        }
+        catch (ex) {
+            return callback(ex);
+        }
         
         var res = {};
         
@@ -56,7 +55,7 @@ module.exports = function (cache) {
             }
         });
         
-        callback(null, res);
+        callback(null, res, handler.name);
     };
     
     this.trimAllStrings = function (obj) {

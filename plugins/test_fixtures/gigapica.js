@@ -1,9 +1,9 @@
 return {
     name: "GigaPica page", // name for this schema
-    host: /^gigapica\.geenstijl\.nl$/, // domain we work on
-    path: /^\/\d{4}\/\d{2}\//, // paths that we match
-    version: "1.0.0",
-    
+    matches: function(location, $) {
+        return location.host === 'gigapica.geenstijl.nl' 
+            && /^\/\d{4}\/\d{2}\//.test(location.path);
+    },
     extract: {
         title: function ($) {
             return $(".artikel h1").text();

@@ -1,9 +1,8 @@
 return {
     name: "Nu.nl article", // name for this schema
-    host: /^(www\.)?nu\.nl$/, // domain we work on
-    path: /^\/\w+\/\d+\//, // paths that we match
-    version: "1.0.0",
-    
+    matches: function(location, $) {
+        return $('#leadarticle').length > 0;
+    },
     extract: {
         title: function ($) {
             return $("h1").eq(0).text();

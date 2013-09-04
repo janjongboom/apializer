@@ -1,8 +1,9 @@
 return {
     name: "CNN Article", // name for this schema
-    host: /^(\w+\.)?cnn\.com$/, // domain we work on
-    path: /^\/\d{4}\//, // paths that we match /2013/05/05
-    version: "1.0.0",
+    
+    matches: function(location, $) {
+        return $('.cnn_storyarea').length > 0;
+    },
     
     extract: {
         title: function ($) {

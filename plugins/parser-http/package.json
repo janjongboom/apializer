@@ -1,10 +1,10 @@
 {
     "name": "parser-http",
     "version": "0.0.1",
-    "main": "./web-plugin.js",
+    "main": "./parser-plugin.js",
     "private": true,
     "plugin": {
-        "consumes": ["parser", "express"],
+        "consumes": ["express"],
         "provides": []
     }
 }

@@ -1,9 +1,8 @@
 return {
     name: "CNN NewsPulse", // name for this schema
-    host: /^api\.cnn\.com$/, // domain we work on
-    path: /.*/, // paths that we match
-    version: "1.0.0",
-    
+    matches: function(location, $) {
+        return location.hostname === 'api.cnn.com';
+    },
     extract: {
         stories: function ($) {
             return [].slice.call($('.nsDataRow')).map(function(i) {

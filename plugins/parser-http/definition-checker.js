@@ -3,10 +3,9 @@ var assert = require("assert");
 module.exports = {
     check: function (definition, callback) {
         try {
-            assert.equal(definition.version, "1.0.0", "version");
+            // assert.equal(definition.version, "1.0.0", "version");
             assert.equal(typeof definition.name, "string", "Type of name");
-            assert.equal(definition.host instanceof RegExp, true, "host instanceof RegExp");
-            assert.equal(definition.path instanceof RegExp, true, "path instanceof RegExp");
+            assert.equal(typeof definition.matches, "function", "Type of function");
             assert.equal(typeof definition.extract, "object", "Type of extract");
             
             assert.equal(Object.keys(definition.extract).every(function (k) {

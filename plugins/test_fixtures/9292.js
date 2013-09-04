@@ -1,7 +1,10 @@
 return {
     name: "9292 reisadvies", // name for this schema
-    host: /^9292\.nl$/, // domain we work on
-    path: /^\/reisadvies\//, // paths that we match
+    
+    matches: function(location, $) {
+        return $('#reis-advies').length > 0;
+    },
+    
     version: "1.0.0",
     
     extract: {
