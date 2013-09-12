@@ -3,6 +3,7 @@ var createWebBinding = require("./web");
 var Parser = require("./parser");
 var async = require("async");
 var definitionChecker = require("./definition-checker").check;
+var vm = require('vm');
 
 module.exports = function setup (options, imports, register) {
     assert(options.prefix, "Option 'prefix' is required");
@@ -13,8 +14,11 @@ module.exports = function setup (options, imports, register) {
     var app = imports.express;
 
     async.map(options.definitions, function (item, next) {
-        // i know its evil, have to add proper protection to this stuff
-        var definition = new Function(item)();
+
+        // this is not perfect, think have to shell out...
+        var definition = vm.createContext({});
+        vm.runInContext(item, definition);
+
         definitionChecker(definition, function (err) {
             if (err) return next(err);
 

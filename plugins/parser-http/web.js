@@ -13,7 +13,7 @@ module.exports = function(app, parser, prefix, allowedHeaders, maxRequestSize) {
 
     var parsedUrl = Url.parse(req.query.url);
     var proxyOptions = {
-      changeOrigin: true,
+      // changeOrigin: true,
       target: {
         host: parsedUrl.host,
         port: parsedUrl.port || (parsedUrl.protocol === 'https:' ? 443 : 80),
@@ -23,6 +23,9 @@ module.exports = function(app, parser, prefix, allowedHeaders, maxRequestSize) {
         xforward: false
       }
     };
+
+    // Work around bug in node-http-proxy with some IIS hosts (www.funda.nl)
+    req.headers.host = parsedUrl.host + (parsedUrl.port ? (':' + parsedUrl.port) : '');
 
     req.url = parsedUrl.path;
     // we don't want people sending us gzip'ed stuff
@@ -52,6 +55,8 @@ module.exports = function(app, parser, prefix, allowedHeaders, maxRequestSize) {
     };
 
     res.setHeader = function(name, value) {
+      console.log('res.setHeader', name, value)
+
       // dont leak headers from client except if theyre in the list
       if (allowedHeaders.indexOf(name) === -1)
         return;
@@ -60,6 +65,11 @@ module.exports = function(app, parser, prefix, allowedHeaders, maxRequestSize) {
     };
 
     res.writeHead = function(code) {
+      if (code < 200 || code >= 300) {
+        resetRes();
+        res.writeHead(code);
+        return;
+      }
       responseCode = code;
     };
 
