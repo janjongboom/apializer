@@ -55,8 +55,6 @@ module.exports = function(app, parser, prefix, allowedHeaders, maxRequestSize) {
     };
 
     res.setHeader = function(name, value) {
-      console.log('res.setHeader', name, value)
-
       // dont leak headers from client except if theyre in the list
       if (allowedHeaders.indexOf(name) === -1)
         return;

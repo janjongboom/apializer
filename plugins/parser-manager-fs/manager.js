@@ -1,12 +1,13 @@
 var assert = require("assert");
 var fs = require("fs");
-var path = require("path");
+var Path = require("path");
 var async = require("async");
 var architect = require("architect");
+var chokidar = require("chokidar");
 
 module.exports = function(options, imports, register) {
   assert(options.bucketPath, "Option 'bucketPath' required");
-  assert(path.existsSync(options.bucketPath), "Option 'bucketPath' is not an existing path");
+  assert(Path.existsSync(options.bucketPath), "Option 'bucketPath' is not an existing path");
 
   options.parserOptions = options.parserOptions || {};
   options.parserOptions.maxRequestSize = options.parserOptions.maxRequestSize || 2 * 1024 * 1024;
@@ -21,6 +22,51 @@ module.exports = function(options, imports, register) {
 
 function ParserManager(folder, parserOptions) {
   var self = this;
+
+  var watcher = chokidar.watch(folder, {
+    ignored: /^\./,
+    persistent: true
+  });
+
+  watcher.on('add', function(path, stat) {
+    var depth = Path.relative(folder, path).split(Path.sep).length;
+    if (depth === 1 && stat.isDirectory()) { // new module
+      self.loadPlugins([path], function(err) {
+        if (err) return console.error('Load new module failed', err);
+
+        console.log('Loaded new module', path);
+      });
+    }
+  });
+
+  watcher.on('change', function(path, stat) {
+    var depth = Path.relative(folder, path).split(Path.sep);
+    if (depth.length === 2 && !stat.isDirectory()) {
+      self.reloadPlugin(Path.dirname(path), function(err) {
+        if (err) return console.error('Reload module failed', err);
+
+        console.log('Reloaded', Path.dirname(path));
+      });
+    }
+  }).on('unlink', function(path) {
+    var depth = Path.relative(folder, path).split(Path.sep);
+    if (depth.length === 1) {
+      self.unloadPlugin(path, function(err) {
+        if (err) return console.error('Unload module failed', err);
+
+        console.log('Unloaded', path);
+      });
+    }
+    else if (depth.length === 2) {
+      self.reloadPlugin(Path.dirname(path), function(err) {
+        if (err) return console.error('Reload module failed', err);
+
+        console.log('Reloaded', Path.dirname(path));
+      });
+    }
+  }).on('error', function(error) {
+    console.error('Watcher error happened', error);
+  });
 
   /**
    * Startup needs to get this service and then pass the architect app
@@ -40,7 +86,7 @@ function ParserManager(folder, parserOptions) {
       if (err) return callback(err);
 
       files = files.map(function(f) {
-        return path.join(folder, f);
+        return Path.join(folder, f);
       });
 
       async.filter(files, function(f, next) {
@@ -51,14 +97,8 @@ function ParserManager(folder, parserOptions) {
         self.loadPlugins(buckets, callback);
       });
     });
-
-    // set up a file watcher for that dir as well
-    fs.watch(folder, { persistent: false }, self.watcher);
   };
 
-  this.watcher = function(ev, filename) {
-    console.log('watcher', ev, filename);
-  };
 
   /**
    * Pass in folderNames as absolute names
@@ -70,7 +110,7 @@ function ParserManager(folder, parserOptions) {
         if (err) return next(err);
 
         // then with that make plugins for architect
-        var name = path.basename(folder);
+        var name = Path.basename(folder);
         var plugin = {
           packagePath: '../parser-http',
           prefix: '/c/' + name,
@@ -96,6 +136,7 @@ function ParserManager(folder, parserOptions) {
           if (err) {
             return callback('loadPlugins failed ' + err);
           }
+
           // done!
           callback();
         });
@@ -108,8 +149,31 @@ function ParserManager(folder, parserOptions) {
       if (err) return callback(err);
 
       async.map(files, function(f, next) {
-        fs.readFile(path.join(defPath, f), "ascii", next);
+        fs.readFile(Path.join(defPath, f), "ascii", next);
       }, callback);
+    });
+  };
+
+  this.unloadPlugin = function(folder, callback) {
+    var plugin = self.app.config.filter(function(c) {
+       return Path.join(__dirname, '../parser-http') === c.packagePath &&
+          c.prefix === '/c/' + Path.basename(folder);
+    })[0];
+
+    if (!plugin) {
+      return callback('Could not find plugin ' + folder);
+    }
+
+    plugin.destroy();
+    callback();
+  };
+
+  this.reloadPlugin = function(folder, callback) {
+    self.unloadPlugin(folder, function(err) {
+      if (err && err.indexOf('Could not find plugin') !== 0)
+        return callback(err);
+
+      self.loadPlugins([folder], callback);
     });
   };
 }
