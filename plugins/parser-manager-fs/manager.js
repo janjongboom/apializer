@@ -11,7 +11,7 @@ module.exports = function(options, imports, register) {
   options.parserOptions = options.parserOptions || {};
   options.parserOptions.maxRequestSize = options.parserOptions.maxRequestSize || 2 * 1024 * 1024;
   options.parserOptions.allowedHeaders = options.parserOptions.allowedHeaders || ['set-cookie'];
-  
+
   var pm = new ParserManager(options.bucketPath, options.parserOptions);
 
   register(null, {
@@ -31,7 +31,6 @@ function ParserManager(folder, parserOptions) {
       if (err) {
         return console.error('ParserManager.init failed', err);
       }
-      console.log('done init');
     };
 
     this.app = app;
@@ -77,11 +76,11 @@ function ParserManager(folder, parserOptions) {
           prefix: '/c/' + name,
           definitions: def
         };
-        
-        for (var o in parserOptions) { 
-          plugin[o] = parserOptions[o]; 
+
+        for (var o in parserOptions) {
+          plugin[o] = parserOptions[o];
         }
-        
+
         return next(null, plugin);
       });
     }, function(err, plugins) {

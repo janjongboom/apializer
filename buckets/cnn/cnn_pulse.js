@@ -1,6 +1,6 @@
 return {
     name: "CNN NewsPulse", // name for this schema
-    matches: function(location, $) {
+    matches: function($, location) {
         return location.hostname === 'api.cnn.com';
     },
     extract: {

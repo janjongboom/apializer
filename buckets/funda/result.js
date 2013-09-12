@@ -1,10 +1,10 @@
 return {
     name: "funda-result", // name for this schema
-    
-    matches: function(location, $) {
+
+    matches: function($, location) {
         return $('.results').length > 0
     },
-    
+
     extract: {
         title: function($) {
             return $('title').text().trim().replace(' [funda]', '')

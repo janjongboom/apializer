@@ -13,8 +13,15 @@ module.exports = function(app, parser, prefix, allowedHeaders, maxRequestSize) {
 
     var parsedUrl = Url.parse(req.query.url);
     var proxyOptions = {
-      host: parsedUrl.host,
-      port: parsedUrl.port || 80
+      changeOrigin: true,
+      target: {
+        host: parsedUrl.host,
+        port: parsedUrl.port || (parsedUrl.protocol === 'https:' ? 443 : 80),
+        https: parsedUrl.protocol === 'https:'
+      },
+      enable: {
+        xforward: false
+      }
     };
 
     req.url = parsedUrl.path;
@@ -29,18 +36,18 @@ module.exports = function(app, parser, prefix, allowedHeaders, maxRequestSize) {
     var buffers = [];
     var totalLength = 0;
     var responseCode;
-    
+
     function resetRes() {
       res.setHeader = _setHeader;
       res.writeHead = _writeHead;
       res.write = _write;
       res.end = _end;
     }
-    
+
     var _next = next;
     next = function(err) {
       resetRes();
-      
+
       _next(err);
     };
 
@@ -48,10 +55,10 @@ module.exports = function(app, parser, prefix, allowedHeaders, maxRequestSize) {
       // dont leak headers from client except if theyre in the list
       if (allowedHeaders.indexOf(name) === -1)
         return;
-      
+
       _setHeader.apply(this, arguments);
     };
-    
+
     res.writeHead = function(code) {
       responseCode = code;
     };
@@ -59,8 +66,6 @@ module.exports = function(app, parser, prefix, allowedHeaders, maxRequestSize) {
     res.write = function(chunk, encoding) {
       totalLength += chunk.length;
       if (totalLength > maxRequestSize) {
-        console.log('request too big');
-
         buffers = null;
 
         return next('Request exceeds maximum of ' + maxRequestSize + ' bytes');
@@ -69,21 +74,35 @@ module.exports = function(app, parser, prefix, allowedHeaders, maxRequestSize) {
     };
 
     res.end = function(chunk, encoding) {
+      if (responseCode < 200 || responseCode >= 300) {
+        resetRes();
+
+        res.writeHead(responseCode);
+        res.end();
+        return;
+      }
       var buffer = Buffer.concat(buffers);
       var charset = chardet.detect(buffer);
-      var iconv = new Iconv(charset, 'UTF-8');
-      var body = iconv.convert(buffer).toString('utf8');
+      var body;
+      try {
+        var iconv = new Iconv(charset, 'UTF-8');
+        body = iconv.convert(buffer).toString('utf8');
+      }
+      catch (ex) {
+        console.log('Error parsing', buffer.toString('utf8'), charset);
+        return next('An error occured during parsing the response');
+      }
 
       parser.parsePage(body, req.query.url, function(err, feed, handlerName) {
         if (err) return next(err);
-        
+
         resetRes();
 
         res.setHeader('Content-Type', 'application/json; charset=utf8');
         res.setHeader('Scrapey-Handler', handlerName);
 
         res.writeHead(responseCode);
-        
+
         if (req.query.callback) {
           res.end(req.query.callback + "(" + JSON.stringify(feed, null, 4) + ")");
         }
