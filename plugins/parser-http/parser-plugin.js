@@ -14,8 +14,8 @@ module.exports = function setup (options, imports, register) {
     var app = imports.express;
 
     async.map(options.definitions, function (item, next) {
-
-        // this is not perfect, think have to shell out...
+        // this is not perfect, need parser that doesnt execute...
+        // as we do all execution in parser-worker.js
         var definition = vm.createContext({});
         vm.runInContext(item, definition);
 
@@ -27,7 +27,7 @@ module.exports = function setup (options, imports, register) {
     }, function (err, files) {
         if (err) return register(err);
 
-        var parser = new Parser(files);
+        var parser = new Parser(options.definitions);
 
         // now attach the parser to a URL
         var web = createWebBinding(app, parser, options.prefix, options.allowedHeaders,

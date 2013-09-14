@@ -1,7 +1,5 @@
 var httpProxy = require('http-proxy');
 var Url = require('url');
-var chardet = require('chardet');
-var Iconv  = require('iconv').Iconv;
 
 module.exports = function(app, parser, prefix, allowedHeaders, maxRequestSize) {
   var proxy = new httpProxy.RoutingProxy();
@@ -65,7 +63,12 @@ module.exports = function(app, parser, prefix, allowedHeaders, maxRequestSize) {
     res.writeHead = function(code) {
       if (code < 200 || code >= 300) {
         resetRes();
-        res.writeHead(code);
+
+        res.writeHead(502);
+        res.end('Other party responded with non 2xx status code ' + code);
+
+        // prevent node-http-proxy to write anything
+        res.write = res.end = function() {};
         return;
       }
       responseCode = code;
@@ -89,22 +92,15 @@ module.exports = function(app, parser, prefix, allowedHeaders, maxRequestSize) {
         res.end();
         return;
       }
+
       var buffer = Buffer.concat(buffers);
-      var charset = chardet.detect(buffer);
-      var body;
-      try {
-        var iconv = new Iconv(charset, 'UTF-8');
-        body = iconv.convert(buffer).toString('utf8');
-      }
-      catch (ex) {
-        console.log('Error parsing', buffer.toString('utf8'), charset);
-        return next('An error occured during parsing the response');
-      }
 
-      parser.parsePage(body, req.query.url, function(err, feed, handlerName) {
-        if (err) return next(err);
-
+      parser.parsePage(buffer, req.query.url, function(err, feed, handlerName) {
         resetRes();
+
+        if (err) {
+          return next(err);
+        }
 
         res.setHeader('Content-Type', 'application/json; charset=utf8');
         res.setHeader('Scrapey-Handler', handlerName);

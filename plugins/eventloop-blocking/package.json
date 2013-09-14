@@ -1,0 +1,10 @@
+{
+    "name": "eventloop-blocking",
+    "version": "0.0.1",
+    "main": "./eventloop.js",
+    "private": true,
+    "plugin": {
+        "consumes": [],
+        "provides": []
+    }
+}

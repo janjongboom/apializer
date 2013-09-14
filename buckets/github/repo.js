@@ -7,5 +7,8 @@ matches = function($, location) {
 extract = {
   name: function($) {
     return $('.js-repo-home-link').text();
+  },
+  description: function($) {
+    return $('.repository-description').text();
   }
 }
