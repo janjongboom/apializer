@@ -1,7 +1,7 @@
 var httpProxy = require('http-proxy');
 var Url = require('url');
 
-module.exports = function(app, parser, prefix, allowedHeaders, maxRequestSize) {
+module.exports = function(app, parsePage, prefix, allowedHeaders, maxRequestSize) {
   var proxy = new httpProxy.RoutingProxy();
 
   app.all(prefix + '/', function(req, res, next) {
@@ -95,7 +95,7 @@ module.exports = function(app, parser, prefix, allowedHeaders, maxRequestSize) {
 
       var buffer = Buffer.concat(buffers);
 
-      parser.parsePage(buffer, req.query.url, function(err, feed, handlerName) {
+      parsePage(buffer, req.query.url, function(err, feed, handlerName) {
         resetRes();
 
         if (err) {

@@ -1,6 +1,5 @@
 var assert = require("assert");
 var createWebBinding = require("./web");
-var Parser = require("./parser");
 var async = require("async");
 var definitionChecker = require("./definition-checker").check;
 var vm = require('vm');
@@ -27,11 +26,12 @@ module.exports = function setup (options, imports, register) {
     }, function (err, files) {
         if (err) return register(err);
 
-        var parser = new Parser(options.definitions);
+        var parsePage = imports.parser.parsePage.bind(imports.parser,
+          options.definitions);
 
         // now attach the parser to a URL
-        var web = createWebBinding(app, parser, options.prefix, options.allowedHeaders,
-          options.maxRequestSize);
+        var web = createWebBinding(app, parsePage, options.prefix,
+          options.allowedHeaders, options.maxRequestSize);
 
         register(null, {
             onDestroy: function() {

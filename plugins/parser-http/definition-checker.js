@@ -17,8 +17,12 @@ module.exports = {
       }
     }
     catch (ex) {
-      if (ex.name === "AssertionError") return callback(ex.message + " should be '" + ex.expected + "' but was '" + ex.actual + "'");
-      else return callback(ex);
+      if (ex.name === "AssertionError") {
+        return callback(ex.message + " should be '" + ex.expected + "' but was '" + ex.actual + "'");
+      }
+      else {
+        return callback(ex);
+      }
     }
 
     callback();

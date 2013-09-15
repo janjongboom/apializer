@@ -1,0 +1,10 @@
+{
+    "name": "parser",
+    "version": "0.0.1",
+    "main": "./parser-plugin.js",
+    "private": true,
+    "plugin": {
+        "consumes": [],
+        "provides": ["parser"]
+    }
+}

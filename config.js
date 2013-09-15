@@ -10,5 +10,9 @@ module.exports = [
     packagePath: "./plugins/parser-manager-fs",
     bucketPath: path.join(__dirname, "./buckets")
   },
+  {
+    packagePath: "./plugins/parser",
+    maxRequestTime: 2 // in seconds
+  },
   "./plugins/eventloop-blocking"
 ];
