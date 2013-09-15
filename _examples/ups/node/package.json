@@ -1,0 +1,8 @@
+{
+    "name": "scrapey-example-ups",
+    "version": "0.0.1",
+    "dependencies": {
+        "async": "0.1.22",
+        "request": "2.27.0"
+    }
+}

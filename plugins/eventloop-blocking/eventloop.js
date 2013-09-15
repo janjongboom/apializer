@@ -6,7 +6,7 @@ module.exports = function(options, imports, register) {
       console.log('Event loop blocked', n-last, 'ms');
     }
     last = n;
-  }, 5);
-  
+  }, 1);
+
   register();
 };

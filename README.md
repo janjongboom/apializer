@@ -3,7 +3,7 @@
 Scrapey is a service that allows to make a consumable API out of any HTTP interface. It works with transformation files written in jQuery that translate an HTML page into a JSON object, while keeping full compatibility with the underlying HTTP interface. That means that POSTs; cookies; and multi-page interactions will still work as expected.
 
 * Transform HTML to JSON
-* Write in javascript, coffeescript, etc. with the jQuery
+* Write in javascript, coffeescript, etc. with jQuery support
 * JSONP and CORS support
 
 ## Get started: simple transformer
@@ -22,7 +22,7 @@ matches = function($, location, rawHTML) {
 }
 
 extract = {
-  // Have simple fields with a jQuery function
+  // Have simple fields with a jQuery function. These fields will form your response.
   name: function($) {
     // You can also return arrays / objects / etc.
     return $('.js-repo-home-link').text();
@@ -35,13 +35,24 @@ extract = {
 
 Now scrapey is active under [http://localhost:8100/c/github/?url=https://github.com/mozilla-b2g/gaia](http://localhost:8100/c/github/?url=https://github.com/mozilla-b2g/gaia).
 
-## Consuming (jQuery)
+## Consuming
+
+jQuery:
 
 ```js
-var scrapey = 'http://localhost:8100/c/github/'
-$.getJSON(scrapey, { url: 'https://github.com/mozilla-b2g/gaia' }, function(data) {
+var url = 'https://github.com/mozilla-b2g/gaia'
+$.getJSON('http://localhost:8100/c/github/', { url: url }, function(data) {
   console.log(data.name);
 })
+```
+
+PHP:
+
+```php
+<?php
+$url = 'https://github.com/mozilla-b2g/gaia';
+$data = json_decode(file_get_contents('http://localhost:8100/c/github/?' . http_build_query(array('url'=>$url))));
+echo $data->name;
 ```
 
 # Transformer syntax

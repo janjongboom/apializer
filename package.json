@@ -16,6 +16,7 @@
         "http-proxy": "0.10.3",
         "node-icu-charset-detector": "0.0.7",
         "iconv": "2.0.7",
-        "chokidar": "0.6.3"
+        "chokidar": "0.6.3",
+        "compute-cluster": "0.0.7"
     }
 }
