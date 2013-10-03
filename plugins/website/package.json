@@ -1,0 +1,10 @@
+{
+    "name": "website",
+    "version": "0.0.1",
+    "main": "./website-plugin.js",
+    "private": true,
+    "plugin": {
+        "consumes": ["express", "parser"],
+        "provides": ["website"]
+    }
+}

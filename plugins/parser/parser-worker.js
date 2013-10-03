@@ -89,10 +89,10 @@ function parsePage(cache, htmlBuffer, url) {
       try {
         res[key] = handler.extract[key]($, url, html);
         // now trim all strings
-        trimAllStrings(res[key]);
+        res[key] = trimAllStrings(res[key]);
       }
       catch (ex) {
-        // console.error("Parsing", key, "failed", ex);
+        console.error("Parsing", key, "failed", ex);
         res[key] = undefined;
       }
     });
@@ -105,15 +105,20 @@ function parsePage(cache, htmlBuffer, url) {
 }
 
 function trimAllStrings(obj) {
-  for (var k in obj) {
-    if (!obj.hasOwnProperty(k)) continue;
-
-    if (typeof obj[k] === "string")
-      obj[k] = obj[k].trim();
-
-    if (typeof obj[k] === "object")
-      trimAllStrings(obj[k]);
+  if (typeof obj === 'string') {
+    return obj.trim();
   }
+  
+  if (obj instanceof Array) {
+    obj.map(trimAllStrings);
+  }
+  else if (typeof obj === "object") {
+    Object.keys(obj).forEach(function(k) {
+      obj[k] = trimAllStrings(obj[k]);
+    });
+  }
+  
+  return obj;
 }
 
 

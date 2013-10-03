@@ -14,5 +14,6 @@ module.exports = [
     packagePath: "./plugins/parser",
     maxRequestTime: 2 // in seconds
   },
+  "./plugins/website",
   "./plugins/eventloop-blocking"
 ];
