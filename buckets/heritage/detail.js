@@ -3,7 +3,7 @@
 name = "uk-national-heritage-detail"
 
 matches = function($, location) {
-  return location.indexOf('CtoDetailServlet') !== -1;
+  return (location + '').indexOf('CtoDetailServlet') !== -1;
 }
 
 extract = {

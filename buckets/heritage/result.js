@@ -3,7 +3,7 @@
 name = "uk-national-heritage"
 
 matches = function($, location) {
-  return location.indexOf('CtoDbQueryServlet') !== -1;
+  return (location + '').indexOf('CtoDbQueryServlet') !== -1;
 }
 
 extract = {
