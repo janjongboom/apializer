@@ -65,7 +65,7 @@ $data = json_decode(file_get_contents('http://localhost:8100/c/github/?' . http_
 echo $data->name;
 ```
 
-# Transformer syntax
+## Transformer syntax
 
 A transformer has three fields:
 
@@ -73,19 +73,41 @@ A transformer has three fields:
 * `matches` - Can this transformer handle the request coming in? It has three arguments, `$` (jQuery), `location` (window.location object) and `rawHTML` (string containing the full responseText). Should evaluate to true or false.
 * `extract` - A function or an object with fields to extract. Every function has access to `$`, `location` and `rawHTML`. You can return any JSON structure.
 
-## Fun stuff: JSONP proxy
+## Advanced example: Scraping a blog
 
-Transformers should return a JS object, so we can easily create a JSONP/CORS proxy.
+As an example I built a small scraper for the [UPS blog](http://blog.ups.com/). A blog has two types of pages, result page and detail page. For both of these we define a transformer by writing some jQuery to detect the page, and then extract the fields we need ([result](/janjongboom/apializer/blob/master/buckets/ups-blog/index.js), [detail](/janjongboom/apializer/blob/master/buckets/ups-blog/detail.js)). Detection normally uses jQuery or the URL.
+
+After that we have a simple proxy up at /c/ups-blog, and we can throw random URLs from the blog at it ([example](http://localhost:8100/c/ups-blog/?url=http://blog.ups.com/page/2/)). To distinguish which kind of page we encountered the name of the transformer is returned in the `scrapey-handler` response header. We can use this in the consuming code to use the data more easy.
+
+So let's say we want to scrape 30 articles, and they are spread out over multiple result pages, we can easily write a program in any language we want ([here's examples in node.js, PHP and C#](/janjongboom/apializer/tree/master/_examples/ups)). In pseudo code it would look like:
 
 ```js
-name = 'api-jsonp'
+queue = new Queue
+queue.push('http://blog.ups.com') // First page
 
-matches = function($) {
-  return true
-}
+while (queue not empty)
+    url = queue.pop() // Get URL and remove from queue
 
-extract = function($, location, html) {
-  // If this is no JSON, this will throw and we'll fail the request
-  return JSON.parse(html)
-}
+    // Make it into Api'alizer URL
+    url = 'http://localhost:8100/c/ups-blog/?url=' + url
+
+    // make request and get JSON out
+    response = http_request(url)
+    json = parse_json(response)
+
+    // if we scraped a result page
+    if 'ups-result' is response.header['scrapey-handler']
+        // add the previous page link we saw to the queue to be scraped
+        queue.push(json.previousPage)
+
+    // detail page with a post
+    else
+        print 'Found post' + json.title
+        articles_found += 1
+
+    // if we found 30 articles, we stop the process
+    if articles_found is 30
+        break
+
+print 'Done scraping!'
 ```
