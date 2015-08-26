@@ -6,6 +6,14 @@ Api'alizer is a service that allows to make a consumable API out of any HTTP int
 * Write in javascript, coffeescript, etc. with jQuery support
 * JSONP and CORS support
 
+## Installation
+
+You'll need icu, on OS/X: `brew install icu4c && brew link icu4c --force`, on Debian: `apt-get install libicu-dev`. Also node.js 0.10+ or io.js.
+
+* Run `npm install`
+* Run `node server.js`
+* Check out the '_examples' folder to see how to use this project in node.js, PHP or C#
+
 ## Get started: simple transformer
 
 This transformer translates any repo homepage in GitHub into a JSON file that contains the name and description of the project.
