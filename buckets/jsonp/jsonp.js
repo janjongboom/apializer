@@ -1,6 +1,6 @@
 // example url: /c/jsonp/?url=https://raw.githubusercontent.com/jan-os/janos/master/taskgraph.json
 
-name = 'scrapey-jsonp'
+name = 'apializer-jsonp'
 matches = function() {
   return true;
 }

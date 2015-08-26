@@ -2,13 +2,13 @@
 var async = require('async');
 var request = require('request');
 
-// The URL to your scrapey instance
-var SCRAPEY = 'http://localhost:8100/c/ups-blog/';
+// The URL to your api'alizer instance
+var APIALIZER = 'http://localhost:8100/c/ups-blog/';
 var maxResultPages = 5;
 
 var q = async.queue(function(url, next) {
-  // Make the request to scrapey
-  request.get(SCRAPEY + '?url=' + encodeURIComponent(url), function(err, res, body) {
+  // Make the request to api'alizer
+  request.get(APIALIZER + '?url=' + encodeURIComponent(url), function(err, res, body) {
     // Check the err variable and res.statusCode here
 
     // We'll get a JSON response so parse the body

@@ -1,6 +1,6 @@
-# Scrapey - APIify any website
+# Api'alizer - APIify any website
 
-Scrapey is a service that allows to make a consumable API out of any HTTP interface. It works with transformation files written in jQuery that translate an HTML page into a JSON object, while keeping full compatibility with the underlying HTTP interface. That means that POSTs; cookies; and multi-page interactions will still work as expected.
+Api'alizer is a service that allows to make a consumable API out of any HTTP interface. It works with transformation files written in jQuery that translate an HTML page into a JSON object, while keeping full compatibility with the underlying HTTP interface. That means that POSTs; cookies; and multi-page interactions will still work as expected.
 
 * Transform HTML to JSON
 * Write in javascript, coffeescript, etc. with jQuery support
@@ -10,7 +10,7 @@ Scrapey is a service that allows to make a consumable API out of any HTTP interf
 
 This transformer translates any repo homepage in GitHub into a JSON file that contains the name and description of the project.
 
-Start Scrapey, create a folder in `buckets/` directory (e.g. `github`), and make a file `repo.js`:
+Start Api'alizer, create a folder in `buckets/` directory (e.g. `github`), and make a file `repo.js`:
 
 ```js
 // A name so you can identify the response (will be sent in the Scrapey-Handler header)
@@ -18,22 +18,22 @@ name = "github-repo"
 
 matches = function($, location, rawHTML) {
   // Can this transfomer handle the page passed in? Return true or false. Can use jQuery, location object (window.location) or rawHTML to decide
-  return $('.js-repo-home-link').length > 0;
+  return $('.octicon-repo').length > 0;
 }
 
 extract = {
   // Have simple fields with a jQuery function. These fields will form your response.
   name: function($) {
     // You can also return arrays / objects / etc.
-    return $('.js-repo-home-link').text();
+    return $('h1 strong').text();
   },
-  description: function($) {
-    return $('.repository-description').text();
+  stargazers: function($) {
+    return $('.octicon-star').closest('li').find('a:last-child').text()
   }
 }
 ```
 
-Now scrapey is active under [http://localhost:8100/c/github/?url=https://github.com/mozilla-b2g/gaia](http://localhost:8100/c/github/?url=https://github.com/mozilla-b2g/gaia).
+Now api'alizer is active under [http://localhost:8100/c/github/?url=https://github.com/mozilla-b2g/gaia](http://localhost:8100/c/github/?url=https://github.com/mozilla-b2g/gaia).
 
 ## Consuming
 
@@ -68,7 +68,7 @@ A transformer has three fields:
 Transformers should return a JS object, so we can easily create a JSONP/CORS proxy.
 
 ```js
-name = 'scrapey-jsonp'
+name = 'api-jsonp'
 
 matches = function($) {
   return true

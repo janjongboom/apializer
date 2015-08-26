@@ -15,5 +15,5 @@ architect.createApp(config, function(err, app) {
 
   app.getService('parser-manager').init(app);
 
-  console.log("Scrapey service started...");
+  console.log("Api'alizer service started...");
 });
