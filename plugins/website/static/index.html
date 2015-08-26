@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Scrapey</title>
+    <style>
+      body>table {
+        width: 100%;
+      }
+      
+      body>table td {
+        padding: 0 1em;
+      }
+      
+      #url {
+        width: 100%;
+        font-size: 1.5em;
+        display: block;
+      }
+      
+      #ta {
+        font-family: monospace;
+        font-size: 1em;
+        width: 100%;
+        height: 300px;
+      }
+      
+      #output, #go {
+        font-size: 1.5em;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Scrapey</h1>
+    <table>
+      <tr>
+        <td width="50%" valign="top">
+          <input type="text" id="url" placeholder="URL of page to scrape" value="https://github.com/mozilla-b2g/gaia"/><br>
+          Your definition file:<br>
+          <div id="ta">// This definition parses any public GitHub repo
+name = "github-repo"
+
+matches = function($, location) {
+  return $('.js-repo-home-link').length > 0;
+}
+
+extract = {
+  name: function($) {
+    return $('.js-repo-home-link').text();
+  },
+  contributors: function($) {
+    var numbers = $('.numbers-summary li');
+    var contributors = $(numbers[numbers.length - 1]).find('.num').text()
+    return Number(contributors)
+  },
+  folders: function($) {
+    return $('.files tr:has(.octicon-file-directory) .js-directory-link')
+        .map(function() { 
+            return $(this).text() 
+        })
+  }
+}
+</div><br>
+          <button id="go">Hit it!</button>
+        </td>
+        <td width="50%" valign="top">
+          <pre id="output"></pre>
+        </td>
+      </tr>
+    </table>
+    
+    <script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.1.01/ace.js"></script>
+    
+    <script>
+      var url = document.querySelector('#url');
+      var definition = document.querySelector('#ta');
+      var go = document.querySelector('#go');
+      var output = document.querySelector('#output');
+      
+      var editor = ace.edit(definition);
+      editor.setTheme("ace/theme/monokai");
+      editor.getSession().setMode("ace/mode/javascript");
+      
+      go.onclick = function() {
+        go.disabled = true;
+        output.textContent = '';
+        
+        var x = new XMLHttpRequest();
+        
+        x.onload = function() {
+          output.textContent = 'Status: ' + x.status + '\n\n' + x.responseText;
+          go.disabled = false;
+        };
+        
+        x.onerror = function() {
+          console.error('oh noes', x.error);
+          go.disabled = false;
+        };
+        
+        x.open('POST', '/preview');
+        x.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        x.send(JSON.stringify({
+          url: url.value,
+          definition: editor.getValue()
+        }));
+      };
+    </script>
+  </body>
+</html>

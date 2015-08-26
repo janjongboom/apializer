@@ -9,6 +9,10 @@ module.exports = function(options, imports, register) {
 
   // https://gist.github.com/jonsullivan/3126319
   var allowCrossDomain = function(req, res, next) {
+    if (req.path.indexOf('/c/') !== 0) {
+      return next();
+    }
+      
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'X-Requested-With, Accept, Origin, Referer, User-Agent, Content-Type, Authorization, X-Mindflash-SessionID');
@@ -25,11 +29,8 @@ module.exports = function(options, imports, register) {
   app.disable('x-powered-by');
 
   app.listen(options.port, options.host);
-
-  app.get("/", function(req, res) {
-    res.writeHead(200);
-    res.end("Hello from Scrapey");
-  });
+  
+  console.log('App listening on', 'http://' + options.host + ':' + options.port);
 
   register(null, {
     express: app

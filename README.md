@@ -76,6 +76,6 @@ matches = function($) {
 
 extract = function($, location, html) {
   // If this is no JSON, this will throw and we'll fail the request
-  return JSON.parse(html);
+  return JSON.parse(html)
 }
 ```
