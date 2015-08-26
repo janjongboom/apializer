@@ -108,16 +108,20 @@ function trimAllStrings(obj) {
   if (typeof obj === 'string') {
     return obj.trim();
   }
-  
+
+  if (typeof obj === 'object' && 'toArray' in obj) { // jQuery array
+    obj = obj.toArray();
+  }
+
   if (obj instanceof Array) {
     obj.map(trimAllStrings);
   }
-  else if (typeof obj === "object") {
+  else if (typeof obj === 'object') {
     Object.keys(obj).forEach(function(k) {
       obj[k] = trimAllStrings(obj[k]);
     });
   }
-  
+
   return obj;
 }
 

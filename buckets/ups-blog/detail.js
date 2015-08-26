@@ -1,3 +1,5 @@
+// example url: /c/ups-blog/?url=http://blog.ups.com/2015/08/19/diy-versus-difm-auto-parts-sales-how-do-you-steer-online-growth/
+
 name = 'ups-detail'
 matches = function($) {
   return $('body').hasClass('single-post')

@@ -1,20 +1,22 @@
-// http://www.visitukheritage.gov.uk/servlet/com.eds.ir.cto.servlet.CtoDbQueryServlet?location=All&class1=All&freetext=&Submit=search
+// example url: http://www.visitukheritage.gov.uk/servlet/com.eds.ir.cto.servlet.CtoDbQueryServlet?location=Kent&class1=All&freetext=&Submit=search
 
 name = "uk-national-heritage"
 
 matches = function($, location) {
-  return (location + '').indexOf('CtoDbQueryServlet') !== -1;
+  return location.path.indexOf('CtoDbQueryServlet') !== -1;
 }
 
 extract = {
   records: function($, url) {
-    return $('tr[valign=top]:gt(0)').map(function(ix, el) {
+    return $('table[border="1"] tr').map(function(ix, el) {
+      if (ix === 0) return;
+
       el = $(el);
       return {
-        desc: el.find('td:nth(1)').text(),
-        location: el.find('td:nth(2)').text(),
-        category: el.find('td:nth(3)').text(),
-        link: el.find('td:nth(1) a').attr('href')
+        desc: el.find('td:nth-child(2)').text(),
+        location: el.find('td:nth-child(3)').text(),
+        category: el.find('td:nth-child(4)').text(),
+        link: el.find('td:nth-child(1) a').attr('href')
       };
     });
   }

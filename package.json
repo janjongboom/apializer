@@ -1,22 +1,22 @@
 {
-    "name": "api-everything-service",
-    "version": "0.0.1",
-    "private": true,
-    "engines": {
-        "node": "0.10.x",
-        "npm": "1.1.x"
-    },
-    "dependencies": {
-        "cheerio": "0.11.0",
-        "express": "3.0.3",
-        "sinon": "1.5.0",
-        "asyncjs": "0.0.9",
-        "architect": "git://github.com/janjongboom/architect.git#96ab69fa77b515110856b7414b87fb5ad3da8677",
-        "async": "0.1.22",
-        "http-proxy": "0.10.3",
-        "node-icu-charset-detector": "0.0.7",
-        "iconv": "2.0.7",
-        "chokidar": "0.6.3",
-        "request": "2.27.0"
-    }
+  "name": "api-everything-service",
+  "version": "0.0.1",
+  "private": true,
+  "engines": {
+    "node": "0.10.x",
+    "npm": "1.1.x"
+  },
+  "dependencies": {
+    "architect": "git://github.com/janjongboom/architect.git#96ab69fa77b515110856b7414b87fb5ad3da8677",
+    "async": "0.1.22",
+    "asyncjs": "0.0.9",
+    "cheerio": "^0.19.0",
+    "chokidar": "0.6.3",
+    "express": "3.0.3",
+    "http-proxy": "0.10.3",
+    "iconv": "2.0.7",
+    "node-icu-charset-detector": "0.0.7",
+    "request": "2.27.0",
+    "sinon": "1.5.0"
+  }
 }

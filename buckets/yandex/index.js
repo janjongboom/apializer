@@ -1,9 +1,11 @@
+// example url: /c/yandex/?url=https://www.yandex.ru/
+
 name = 'yandex-index'
 matches = function() {
   return true;
 }
 extract = {
-  test: function($) {
-    return $('.b-morda-search-form').attr('action');
+  weather: function($) {
+    return $('.b-weather > .b-content-item__title').text();
   }
 }

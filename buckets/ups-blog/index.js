@@ -1,3 +1,5 @@
+// example url: /c/ups-blog/?url=http://blog.ups.com/
+
 name = 'ups-result'
 
 matches = function($, location) {

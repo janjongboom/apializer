@@ -1,16 +1,15 @@
-// http://www.visitukheritage.gov.uk/servlet/com.eds.ir.cto.servlet.CtoDbQueryServlet?location=All&class1=All&freetext=&Submit=search
+// example url: http://www.visitukheritage.gov.uk/servlet/com.eds.ir.cto.servlet.CtoDetailServlet?ID=5221
 
 name = "uk-national-heritage-detail"
 
 matches = function($, location) {
-  return (location + '').indexOf('CtoDetailServlet') !== -1;
+  return location.path.indexOf('CtoDetailServlet') !== -1;
 }
 
 extract = {
   detail: function($) {
-    var table = $('table:nth(2)');
-    var tds = table.find('tr').map(function(ix, tr) {
-      return $(tr).find('td:nth(2)');
+    var tds = $('table:nth-child(4) tr').map(function(ix, el) {
+      return $(el).find('td:nth-child(3)');
     });
 
     return {

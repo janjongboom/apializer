@@ -1,3 +1,5 @@
+// example page: /c/funda/?url=http://www.funda.nl/koop/amsterdam/
+
 name = "funda-result"; // name for this schema
 
 matches = function($, location) {
