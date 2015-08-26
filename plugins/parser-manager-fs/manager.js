@@ -7,7 +7,7 @@ var chokidar = require("chokidar");
 
 module.exports = function(options, imports, register) {
   assert(options.bucketPath, "Option 'bucketPath' required");
-  assert(Path.existsSync(options.bucketPath), "Option 'bucketPath' is not an existing path");
+  assert(fs.existsSync(options.bucketPath), "Option 'bucketPath' is not an existing path");
 
   options.parserOptions = options.parserOptions || {};
   options.parserOptions.maxRequestSize = options.parserOptions.maxRequestSize || 2 * 1024 * 1024;
