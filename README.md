@@ -6,6 +6,8 @@ Api'alizer is a service that allows to make a consumable API out of any HTTP int
 * Write in javascript, coffeescript, etc. with jQuery support
 * JSONP and CORS support
 
+This is a nice way of building f.e. scrapers as the person writing the scraper only needs to know jQuery to create a well-defined API for a target website. Api'alizer also supports multiple page formats (e.g. this is a detail page, this is a result page) so no need to specify that from your end. The resulting API is easy to consume from any programming language. An example on how to scrape the UPS blog is available for node.js, PHP and C#.
+
 ## Installation
 
 You'll need icu, on OS/X: `brew install icu4c && brew link icu4c --force`, on Debian: `apt-get install libicu-dev`. Also node.js 0.10+ or io.js.
@@ -41,7 +43,7 @@ extract = {
 }
 ```
 
-Now api'alizer is active under [http://localhost:8100/c/github/?url=https://github.com/mozilla-b2g/gaia](http://localhost:8100/c/github/?url=https://github.com/mozilla-b2g/gaia).
+You do not need to restart the service. Changes are automatically picked up from the file system. Now api'alizer is active under [http://localhost:8100/c/github/?url=https://github.com/mozilla-b2g/gaia](http://localhost:8100/c/github/?url=https://github.com/mozilla-b2g/gaia).
 
 ## Consuming
 
